@@ -30,8 +30,9 @@ using namespace SPPARKS_NS;
    create an instance of SPPARKS and return pointer to it
 ------------------------------------------------------------------------- */
 
-void spparks_open(int argc, char **argv, MPI_Comm communicator, void **ptr)
+void spparks_open(int argc, char **argv, MPI_Fint *fcommunicator, void **ptr)
 {
+  MPI_Comm communicator = MPI_Comm_f2c(*fcommunicator);
   SPPARKS *spk = new SPPARKS(argc,argv,communicator);
   *ptr = (void *) spk;
 }
