@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-void spparks_open(int, char **, MPI_Comm, void **);
+void spparks_open(int, char **, MPI_Fint *, void **);
 void spparks_open_no_mpi(int, char **, void **);
 void spparks_close(void *);
 void spparks_file(void *, char *);
