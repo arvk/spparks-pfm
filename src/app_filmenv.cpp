@@ -40,7 +40,7 @@ AppFILMENV::AppFILMENV(SPPARKS *spk, int narg, char **arg) :
   AppLattice(spk,narg,arg)
 {
   ninteger = 2;
-  ndouble = 0;
+  ndouble = 1;
   delpropensity = 2;
   delevent = 1;
   allow_kmc = 1;
@@ -186,9 +186,12 @@ double AppFILMENV::site_energy(int i)
 double AppFILMENV::site_propensity(int i)
 {
   int mystate,neighstate,ineigh,j;
-  double einitial,efinal,einitiali,proball,probone;
+  double einitial,efinal,einitiali,proball,probone,pbias,fullpbias;
 
   mystate = height[i];
+  pbias = darray[0][i];
+
+  fullpbias = fullp * pbias;
 
   clear_events(i);
 
@@ -205,8 +208,8 @@ double AppFILMENV::site_propensity(int i)
     efinal = 2.0*(site_energy(i)+site_energy(j))-
              bondeng*abs(height[i]-height[j])*stepheight;
 
-    if (efinal <= einitial) probone = fullp;
-    else probone = fullp*exp((einitial-efinal)*tscale_inverse);
+    if (efinal <= einitial) probone = fullpbias;
+    else probone = fullpbias*exp((einitial-efinal)*tscale_inverse);
     if (probone > 0.0) {
       add_event(i,j,probone,0);
       proball += probone;
@@ -216,21 +219,22 @@ double AppFILMENV::site_propensity(int i)
   }
 
   // Add vacancy formation and annihilation events
+  height[i] = mystate;
   einitial = site_energy(i);
   height[i] = mystate-1;
   efinal = site_energy(i);
   height[i] = mystate;
 
   // Vacancy formation event
-  if (einitial <= efinal) probone = fullp*0.0001;
-  else probone = fullp*exp((efinal-einitial)*tscale_inverse)*0.0001;
-  //  probone = fullp*exp((0-einitial)*tscale_inverse);
+  if (efinal <= einitial) probone = fullpbias*0.0001;
+  else probone = fullpbias*exp((einitial-efinal)*tscale_inverse)*0.0001;
+  //  probone = fullpbias*exp((0-einitial)*tscale_inverse);
   add_event(i,i,probone,0);
   proball += probone;
 
   // Vacancy annihilation event
-  // if (einitial <= efinal) probone = fullp;
-  // else probone = fullp*exp((einitial-efinal)*tscale_inverse);
+  // if (einitial <= efinal) probone = fullpbias;
+  // else probone = fullpbias*exp((einitial-efinal)*tscale_inverse);
   // add_event(i,i,probone,0);
   // proball += probone;
 
