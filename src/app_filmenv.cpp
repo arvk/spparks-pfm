@@ -5,7 +5,7 @@
 
    Copyright (2008) Sandia Corporation.  Under the terms of Contract
    DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains
-   certain rights in this software.  This software is distributed under 
+   certain rights in this software.  This software is distributed under
    the GNU General Public License.
 
    See the README file in the top-level SPPARKS directory.
@@ -36,7 +36,7 @@ enum{XSIN,STRING,NONE};
 
 /* ---------------------------------------------------------------------- */
 
-AppFILMENV::AppFILMENV(SPPARKS *spk, int narg, char **arg) : 
+AppFILMENV::AppFILMENV(SPPARKS *spk, int narg, char **arg) :
   AppLattice(spk,narg,arg)
 {
   ninteger = 2;
@@ -51,7 +51,7 @@ AppFILMENV::AppFILMENV(SPPARKS *spk, int narg, char **arg) :
   // parse arguments
 
   if (narg < 2) error->all(FLERR,"Illegal app_style command");
-  
+
   bondeng = atof(arg[1]);
 
   instyle = NONE;
@@ -175,7 +175,7 @@ double AppFILMENV::site_energy(int i)
     eng = eng + abs(isite-jsite);
   }
 
-  return (double) 0.5*eng*bondeng*stepheight; 
+  return (double) 0.5*eng*bondeng*stepheight;
 }
 
 /* ----------------------------------------------------------------------
@@ -226,9 +226,8 @@ double AppFILMENV::site_propensity(int i)
   height[i] = mystate;
 
   // Vacancy formation event
-  if (efinal <= einitial) probone = fullpbias*0.0001;
-  else probone = fullpbias*exp((einitial-efinal)*tscale_inverse)*0.0001;
-  //  probone = fullpbias*exp((0-einitial)*tscale_inverse);
+  if (efinal <= einitial) probone = fullpbias;
+  else probone = fullpbias*exp((einitial-efinal)*tscale_inverse);
   add_event(i,i,probone,0);
   proball += probone;
 
@@ -366,7 +365,7 @@ void AppFILMENV::add_event(int i, int partner, double propensity, int incre)
 
   if (nevents == maxevent) {
     maxevent += DELTAEVENT;
-    events = 
+    events =
       (Event *) memory->srealloc(events,maxevent*sizeof(Event),"app:events");
     for (int m = nevents; m < maxevent; m++) events[m].next = m+1;
     freeevent = nevents;
@@ -384,7 +383,7 @@ void AppFILMENV::add_event(int i, int partner, double propensity, int incre)
 /* ----------------------------------------------------------------------
   create height values
 ------------------------------------------------------------------------- */
- 
+
 void AppFILMENV::create_height(double xwl, double zwl, double amp)
 {
   double x,y,z;
