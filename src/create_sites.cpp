@@ -35,7 +35,7 @@ using namespace SPPARKS_NS;
 // same as in lattice.cpp
 
 enum{NONE,LINE_2N,SQ_4N,SQ_8N,TRI,SC_6N,SC_26N,FCC,BCC,DIAMOND,
-       FCC_OCTA_TETRA,RANDOM_1D,RANDOM_2D,RANDOM_3D};
+     FCC_OCTA_TETRA,RANDOM_1D,RANDOM_2D,RANDOM_3D,MKW};
 
 enum{BOX,REGION};
 enum{DUMMY,IARRAY,DARRAY};
@@ -155,7 +155,7 @@ void CreateSites::command(int narg, char **arg)
       latstyle == SQ_4N || latstyle == SQ_8N || latstyle == TRI || 
       latstyle == SC_6N || latstyle == SC_26N || 
       latstyle == FCC || latstyle == BCC || latstyle == DIAMOND ||
-      latstyle == FCC_OCTA_TETRA) {
+      latstyle == FCC_OCTA_TETRA || latstyle == MKW) {
 
     xlattice = domain->lattice->xlattice;
     ylattice = domain->lattice->ylattice;
@@ -408,6 +408,7 @@ void CreateSites::structured_connectivity()
   if (latstyle == LINE_2N) maxneigh = 2;
   else if (latstyle == SQ_4N) maxneigh = 4;
   else if (latstyle == SQ_8N) maxneigh = 8;
+  else if (latstyle == MKW) maxneigh = 8;
   else if (latstyle == TRI) maxneigh = 6;
   else if (latstyle == SC_6N) maxneigh = 6;
   else if (latstyle == SC_26N) maxneigh = 26;
@@ -1124,6 +1125,9 @@ void CreateSites::offsets(double **basis)
   else if (latstyle == SQ_8N)
     for (int m = 0; m < nbasis; m++)
       offsets_2d(m,basis,xlattice,sqrt(2.0)*xlattice,maxneigh,cmap[m]);
+  else if (latstyle == MKW)
+    for (int m = 0; m < nbasis; m++)
+      offsets_2d(m,basis,xlattice/2.0,sqrt(2.0)/2.0*xlattice,maxneigh,cmap[m]);
   else if (latstyle == TRI)
     for (int m = 0; m < nbasis; m++)
       offsets_2d(m,basis,xlattice,xlattice,maxneigh,cmap[m]);

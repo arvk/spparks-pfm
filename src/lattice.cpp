@@ -26,7 +26,7 @@ using namespace SPPARKS_NS;
 // same as in create_sites.cpp and diag_cluster.cpp
 
 enum{NONE,LINE_2N,SQ_4N,SQ_8N,TRI,SC_6N,SC_26N,FCC,BCC,DIAMOND,
-       FCC_OCTA_TETRA,RANDOM_1D,RANDOM_2D,RANDOM_3D};
+     FCC_OCTA_TETRA,RANDOM_1D,RANDOM_2D,RANDOM_3D,MKW};
 
 /* ---------------------------------------------------------------------- */
 
@@ -50,6 +50,7 @@ Lattice::Lattice(SPPARKS *spk, int narg, char **arg) : Pointers(spk)
   else if (strcmp(arg[0],"random/1d") == 0) style = RANDOM_1D;
   else if (strcmp(arg[0],"random/2d") == 0) style = RANDOM_2D;
   else if (strcmp(arg[0],"random/3d") == 0) style = RANDOM_3D;
+  else if (strcmp(arg[0],"mkw") == 0) style = MKW;
   else error->all(FLERR,"Illegal lattice command");
 
   if (style == NONE) {
@@ -60,7 +61,7 @@ Lattice::Lattice(SPPARKS *spk, int narg, char **arg) : Pointers(spk)
   if (style == LINE_2N || style == SQ_4N || style == SQ_8N ||
       style == TRI || style == SC_6N || style == SC_26N ||
       style == FCC || style == BCC || style == DIAMOND || 
-      style == FCC_OCTA_TETRA) {
+      style == FCC_OCTA_TETRA || style == MKW) {
     if (narg != 2) error->all(FLERR,"Illegal lattice command");
     latconst = atof(arg[1]);
   }
@@ -78,7 +79,7 @@ Lattice::Lattice(SPPARKS *spk, int narg, char **arg) : Pointers(spk)
       domain->dimension != 1)
     error->all(FLERR,"Lattice style does not match dimension");
   if ((style == SQ_4N || style == SQ_8N || style == TRI || 
-       style == RANDOM_2D) && 
+       style == RANDOM_2D || style == MKW) && 
       domain->dimension != 2)
     error->all(FLERR,"Lattice style does not match dimension");
   if ((style == SC_6N || style == SC_26N || style == FCC || 
@@ -95,6 +96,11 @@ Lattice::Lattice(SPPARKS *spk, int narg, char **arg) : Pointers(spk)
   if (style == LINE_2N || style == SQ_4N || style == SQ_8N ||
       style == SC_6N || style == SC_26N) {
     add_basis(0.0,0.0,0.0);
+  } else if (style == MKW) {
+    add_basis(0.0,0.0,0.0);
+    add_basis(0.5,0.0,0.0);
+    add_basis(0.0,0.5,0.0);
+    add_basis(0.5,0.5,0.0);
   } else if (style == TRI) {
     add_basis(0.0,0.0,0.0);
     add_basis(0.5,0.5,0.0);
@@ -214,6 +220,8 @@ int Lattice::ncolors(int delcolor)
     n = (delcolor+1)*(delcolor+1)*(delcolor+1);
     if (nx % (delcolor+1) || ny % (delcolor+1) || nz % (delcolor+1))
       error->all(FLERR,"Color stencil is incommensurate with lattice size");
+  } else if (style == MKW) {
+    if (delcolor == 1) n = 4;
   } else if (style == FCC) {
     if (delcolor == 1) n = 4;
   } else if (style == BCC) {
@@ -267,6 +275,9 @@ int Lattice::id2color(tagint idsite, int delcolor)
     k = idsite / (nx*ny);
     icolor = ncolor1d*ncolor1d*(k%ncolor1d) + 
       ncolor1d*(j%ncolor1d) + i%ncolor1d;
+
+  } else if (style == MKW) {
+    icolor = idsite % 4;
 
   } else if (style == FCC) {
     icolor = idsite % 4;
