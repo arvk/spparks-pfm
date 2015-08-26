@@ -360,8 +360,8 @@ double AppMetfilm::site_propensity(int i)
 	if (type[i] != ttype[m][0] || element[i] != tinput[m][0]) continue;
 	if (type[j] != ttype[m][1] || element[j] != tinput[m][1]) continue;
 	if (type[k] != ttype[m][2] || element[k] != tinput[m][2]) continue;
-	add_event(i,3,m,tpropensity[m],j,k);
-	proball += tpropensity[m];
+	add_event(i,3,m,tpropensity[m]*std::max(iarray[2][i],10),j,k);
+	proball += tpropensity[m]*std::max(iarray[2][i],10);
       }
     }
   }
